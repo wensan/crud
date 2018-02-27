@@ -12,3 +12,6 @@ Route::get('/comments/comment', 'CommentController@addComment');
 Route::get('/comments/page', 'CommentController@getComments');
 Route::get('/comments/reply', 'CommentController@replyComment');
 Route::get('/comments/listreply', 'CommentController@listReplies');
+
+//Admin
+Route::get('/admin', 'AdminController@index');

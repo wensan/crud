@@ -244,7 +244,7 @@ function listReply(c_id) {
 function loadLoggedUser(role, token) {
     var _menu = "<form class='navbar-form navbar-right'>";
     if (role == "admin") {
-        _menu += "<button id='load-admin-page' class='btn btn-default'>Admin</button>";
+        _menu += "<button type='button' class='btn btn-default' onclick='loadAdmin(event)' style='margin-right: 5px'>Manage</button>";
         _menu += "<button id='logout' class='btn btn-default'>Logout</button>";
     } else {
         _menu += "<button id='logout' class='btn btn-default'>Logout</button>";
@@ -289,6 +289,20 @@ function loginBtn() {
         }, function(err) {
            alert(err.data.message);
         });
+    });
+}
+
+//Admin
+function loadAdmin(e) {
+    e.preventDefault();
+    ajaxCallJwt({
+        url: "/admin",
+        type: "GET",
+        data: {},
+        dataType: "HTML",
+        token: _token
+    }, function(html) {
+        $(".page-content").html(html);
     });
 }
 

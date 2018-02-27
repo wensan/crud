@@ -7,7 +7,6 @@
     <script src="{{asset('js/bootstrap.min.js')}}"></script>
     <script src="{{asset('js/script.js')}}"></script>
     <link rel="stylesheet" href="{{asset('css/bootstrap.min.css')}}" />
-    <link rel="stylesheet" href="{{asset('css/bootstrap-theme.min.css')}}" />
     <link rel="stylesheet" href="{{asset('css/style.css')}}" />
     <script>
         window.Laravel = {!! json_encode([

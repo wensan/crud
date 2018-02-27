@@ -36,3 +36,5 @@ Route::get('/auth/token', 'TokenController@auth');
 Route::get('/auth/refresh', 'TokenController@refresh');
 Route::get('/auth/token/invalidate', 'TokenController@invalidate');
 Route::get('/auth/isvalid', 'TokenController@isvalid');
+
+Route::put('/admin/{id}', 'AdminController@manageUser');

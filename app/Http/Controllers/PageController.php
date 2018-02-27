@@ -15,7 +15,7 @@ class PageController extends Controller
 
     public function listPages() {
         $pages = Page::orderBy('created_at', 'asc')->get();
-        $user = $this->checkUser();
+        $user = _getLoggedUser();
         foreach($pages as $page) {
             $page->page_content = $this->shortenText($page->page_content, 50);
         }
@@ -24,7 +24,7 @@ class PageController extends Controller
 
     public function getSinglePage($id = null) {
         $page = Page::find($id);
-        $user = $this->checkUser();
+        $user = _getLoggedUser();
         return view('page.single', ['page' => $page, 'user' => $user]);
     }
 
@@ -33,7 +33,7 @@ class PageController extends Controller
         $page->title = $request->title;
         $page->page_content = $request->page_content;
         $page->user()->associate($request->user());
-        $user = $this->checkUser();
+        $user = _getLoggedUser();
         if ($user->role == "admin") {
             $page->save();
             return response()->json([
@@ -50,11 +50,6 @@ class PageController extends Controller
               ]
           ]);
         }
-    }
-
-    private function checkUser() {
-        $user = JWTAuth::toUser();
-        return $user;
     }
 
     private function shortenText($text, $words_count) {
