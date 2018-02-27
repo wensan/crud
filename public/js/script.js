@@ -42,6 +42,7 @@ $(document).ready(function() {
         }, function(html) {
             $("#navbar-menu").html(html);
             loginBtn();
+            listPages();
         }, function(err) {
             alert(err);
         });
@@ -74,27 +75,47 @@ $(document).ready(function() {
 //Pages
 function loadPage(me) {
     var id = $(me).attr("_id");
-    ajaxCallJwt({
-        url: "/pages/page/" + id,
-        type: "GET",
-        dataType: "HTML",
-        token: _token
-    }, function(html) {
-        page_id = id;
-        $(".page-content").html(html);
-        listComments(page_id);
-    });
+    if (_token != null) {
+        ajaxCallJwt({
+            url: "/pages/page/" + id,
+            type: "GET",
+            dataType: "HTML",
+            token: _token
+        }, function(html) {
+            page_id = id;
+            $(".page-content").html(html);
+            listComments(page_id);
+        });
+    } else {
+        ajaxCallJwt({
+            url: "/visitor/page/" + id,
+            type: "GET",
+            dataType: "HTML"
+        }, function(html) {
+            $(".page-content").html(html);
+        });
+    }
 }
 
 function listPages() {
-    ajaxCallJwt({
-        url: "/pages/list",
-        type: "GET",
-        dataType: "HTML",
-        token: _token
-    }, function(html) {
-        $(".page-content").html(html);
-    });
+    if (_token != null) {
+        ajaxCallJwt({
+            url: "/pages/list",
+            type: "GET",
+            dataType: "HTML",
+            token: _token
+        }, function(html) {
+            $(".page-content").html(html);
+        });
+    } else {
+        ajaxCallJwt({
+            url: "/visitor/pages/list",
+            type: "GET",
+            dataType: "HTML"
+        }, function(html) {
+            $(".page-content").html(html);
+        });
+    }
 }
 
 //comments

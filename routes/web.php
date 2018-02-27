@@ -15,3 +15,7 @@ Route::get('/comments/listreply', 'CommentController@listReplies');
 
 //Admin
 Route::get('/admin', 'AdminController@index');
+
+//Visitor
+Route::get('/visitor/pages/list', 'VisitorController@listPages');
+Route::get('/visitor/page/{id}', 'VisitorController@getSinglePage');
