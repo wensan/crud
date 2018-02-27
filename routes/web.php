@@ -10,3 +10,5 @@ Route::get('/pages/page/{id}', 'PageController@getSinglePage');
 //Comments
 Route::get('/comments/comment', 'CommentController@addComment');
 Route::get('/comments/page', 'CommentController@getComments');
+Route::get('/comments/reply', 'CommentController@replyComment');
+Route::get('/comments/listreply', 'CommentController@listReplies');

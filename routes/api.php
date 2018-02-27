@@ -23,6 +23,14 @@ Route::group(['prefix' => 'pages'], function() {
     Route::post('/', 'PageController@add_page')->middleware('jwt.auth');
 });
 
+//comments
+Route::put('/comments/{id}', 'CommentController@hideComment');
+Route::delete('/comments/{id}', 'CommentController@deleteComment');
+
+//Reply
+Route::put('/comments/reply/{id}', 'CommentController@hideReply');
+Route::delete('/comments/reply/{id}', 'CommentController@deleteReply');
+
 //Authentication JWT
 Route::get('/auth/token', 'TokenController@auth');
 Route::get('/auth/refresh', 'TokenController@refresh');

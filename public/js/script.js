@@ -1,6 +1,12 @@
+//GLOBAL
+var page_id = null,
+    comment_id = null,
+    reply_id = null,
+    _token = null;
+
 $(document).ready(function() {
-    var _token = readCookie("token");
-    if (_token) {
+    _token = readCookie("token");
+    if (_token != null) {
       //check validity
         ajaxCallJwt({
             type: "GET",
@@ -65,6 +71,176 @@ $(document).ready(function() {
 
 });
 
+//Pages
+function loadPage(me) {
+    var id = $(me).attr("_id");
+    ajaxCallJwt({
+        url: "/pages/page/" + id,
+        type: "GET",
+        dataType: "HTML",
+        token: _token
+    }, function(html) {
+        page_id = id;
+        $(".page-content").html(html);
+        listComments(page_id);
+    });
+}
+
+function listPages() {
+    ajaxCallJwt({
+        url: "/pages/list",
+        type: "GET",
+        dataType: "HTML",
+        token: _token
+    }, function(html) {
+        $(".page-content").html(html);
+    });
+}
+
+//comments
+function listComments(pageId) {
+    ajaxCallJwt({
+        url: "/comments/page",
+        type: "GET",
+        data: {id: pageId},
+        dataType: "HTML",
+        token: _token
+    }, function(html) {
+        $(".comments-section").html(html);
+    });
+}
+
+function showCommentBox(me) {
+    var _id = $(me).attr("_id");
+    $("#addComment").modal("show");
+    $("#addComment").attr("_id", _id);
+    $("#addComment").find("textarea").val("");
+}
+
+function saveComment(me) {
+    var _id = $(me).closest("#addComment").attr("_id");
+    var body = $(me).closest("#addComment").find("textarea").val();
+    if (body != "") {
+        ajaxCallJwt({
+            url: "/comments/comment",
+            type: "GET",
+            data: {id: _id, comment: body},
+            dataType: "HTML",
+            token: _token
+        }, function(html) {
+            $(".comments-section").html(html);
+            $("#addComment").modal("hide");
+        });
+    } else {
+        alert("Please provide a comment");
+    }
+}
+
+function hideComment(me) {
+    var _id = $(me).attr("_id");
+    ajaxCallJwt({
+        url: "/api/comments/" + _id,
+        type: "PUT",
+        data: {},
+        dataType: "json",
+        token: _token
+    }, function(res) {
+        if (res.data.status == 200)
+            listComments(page_id);
+        else
+            alert(res.data.message);
+    });
+}
+
+function deleteComment(me) {
+    var _id = $(me).attr("_id");
+    ajaxCallJwt({
+        url: "/api/comments/" + _id,
+        type: "DELETE",
+        data: {},
+        dataType: "json",
+        token: _token
+    }, function(res) {
+        if (res.data.status == 200)
+            listComments(page_id);
+        else
+            alert(res.data.message);
+    });
+}
+
+function showCommentReplyBox(me) {
+    var _id = $(me).attr("_id");
+    $("#replyComment").modal("show");
+    $("#replyComment").attr("_id", _id);
+    $("#replyComment").find("textarea").val("");
+}
+
+function saveCommentReply(me) {
+    var _id = $(me).closest("#replyComment").attr("_id");
+    var body = $(me).closest("#replyComment").find("textarea").val();
+    if (body != "") {
+        ajaxCallJwt({
+            url: "/comments/reply",
+            type: "GET",
+            data: {comment_id: _id, reply: body},
+            dataType: "HTML",
+            token: _token
+        }, function(html) {
+            $(".comments-section").find(".comment-replies_" + _id).html(html);
+            $("#replyComment").modal("hide");
+        });
+    } else {
+        alert("Please provide a reply");
+    }
+}
+
+function hideReply(me) {
+    var _id = $(me).attr("_id");
+    var _c_id = $(me).attr("__id");
+    ajaxCallJwt({
+        url: "/api/comments/reply/" + _id,
+        type: "PUT",
+        data: {},
+        dataType: "json",
+        token: _token
+    }, function(res) {
+        if (res.data.status == 200)
+            listReply(_c_id);
+        else
+            alert(res.data.message);
+    });
+}
+
+function deleteReply(me) {
+    var _id = $(me).attr("_id");
+    var _c_id = $(me).attr("__id");
+    ajaxCallJwt({
+        url: "/api/comments/reply/" + _id,
+        type: "DELETE",
+        data: {},
+        dataType: "json",
+        token: _token
+    }, function(res) {
+        if (res.data.status == 200)
+            listReply(_c_id);
+        else
+            alert(res.data.message);
+    });
+}
+
+function listReply(c_id) {
+    ajaxCallJwt({
+        url: "/comments/listreply",
+        type: "GET",
+        data: {comment_id: c_id},
+        dataType: "HTML",
+        token: _token
+    }, function(html) {
+        $(".comments-section").find(".comment-replies_" + c_id).html(html);
+    });
+}
+//END Comments
+
 function loadLoggedUser(role, token) {
     var _menu = "<form class='navbar-form navbar-right'>";
     if (role == "admin") {
@@ -76,7 +252,7 @@ function loadLoggedUser(role, token) {
     _menu += "</div>";
     $("#navbar-menu").html(_menu);
 
-    listPages(token);
+    listPages();
 
     $("#logout").click(function(e) {
         e.preventDefault();
@@ -90,76 +266,6 @@ function loadLoggedUser(role, token) {
               window.location.reload();
               eraseCookie("token");
           })
-    });
-}
-
-function listPages(token) {
-    ajaxCallJwt({
-        url: "/pages/list",
-        type: "GET",
-        dataType: "HTML",
-        token: token
-    }, function(html) {
-        $(".page-content").html(html);
-        pageButtonEvents(token);
-    });
-}
-
-function pageButtonEvents(token) {
-    $(".load-page").click(function() {
-        var id = $(this).attr("_id");
-        ajaxCallJwt({
-            url: "/pages/page/" + id,
-            type: "GET",
-            dataType: "HTML",
-            token: token
-        }, function(html) {
-            $(".page-content").html(html);
-            ajaxCallJwt({
-                url: "/comments/page",
-                type: "GET",
-                data: {id: id},
-                dataType: "HTML",
-                token: token
-            }, function(html) {
-                $(".comments-section").html(html);
-                $("#addComment").modal("hide");
-                commentReplyEvents(token);
-            });
-        });
-    });
-}
-
-function commentReplyEvents(token) {
-    $(".comment-page").click(function() {
-        var _id = $(this).attr("_id");
-        $("#addComment").modal("show");
-        $("#addComment").attr("_id", _id);
-    });
-
-    $(".reply-comment").click(function() {
-        var _id = $(this).attr("_id");
-        $("#replyComment").modal("show");
-        $("#replyComment").attr("_id", _id);
-    });
-
-    $(".btn-add-comment").click(function() {
-        var _id = $("#addComment").attr("_id");
-        var body = $("#addComment").find("textarea").val();
-        if (body != "") {
-            ajaxCallJwt({
-                url: "/comments/comment",
-                type: "GET",
-                data: {id: _id, comment: body},
-                dataType: "HTML",
-                token: token
-            }, function(html) {
-                $(".comments-section").html(html);
-                $("#addComment").modal("hide");
-            });
-        } else {
-            alert("Please provide a comment");
-        }
     });
 }
 
@@ -188,6 +294,7 @@ function loginBtn() {
 
 function ajaxCallJwt(ops, callback, errorCallback) {
     $.ajax({
+        method: ops.type,
         type: ops.type,
         url: base_url + ops.url,
         data: ops.data,
@@ -208,6 +315,7 @@ function ajaxCallJwt(ops, callback, errorCallback) {
 function ajaxCall(ops, callback, errorCallback) {
     $.ajax({
         type: ops.type,
+        method: ops.type,
         url: base_url + ops.url,
         data: ops.data,
         contentType: ops.contentType,

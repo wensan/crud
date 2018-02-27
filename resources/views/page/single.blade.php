@@ -6,7 +6,7 @@
             </div>
             <div class="panel-body">
                 <p>{{ $page->page_content }}</p>
-                <button class="btn btn-default btn-sm comment-page" _id={{ $page->id }}>Comment</button>
+                <button class="btn btn-default btn-sm comment-page" _id={{ $page->id }} onclick="showCommentBox(this)">Comment</button>
             </div>
         </div>
         <div class="comments-section"></div>
@@ -27,7 +27,7 @@
           </div>
           <div class="modal-footer">
               <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-              <button type="submit" class="btn btn-primary btn-add-comment">Save</button>
+              <button type="submit" class="btn btn-primary" onclick="saveComment(this)">Save</button>
           </div>
       </div>
     </div>
@@ -47,7 +47,7 @@
           </div>
           <div class="modal-footer">
               <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-              <button type="submit" class="btn btn-primary btn-add-reply-comment">Save</button>
+              <button type="submit" class="btn btn-primary" onclick="saveCommentReply(this)">Save</button>
           </div>
       </div>
     </div>
